@@ -1,0 +1,40 @@
+private void LoadProducts()
+{
+    try
+    {
+        using (SqlConnection connection = new SqlConnection(connectionString))
+        {
+            connection.Open();
+
+            string query = @"SELECT product_name, category, description, manufacturer, supplier, 
+                             price, unit_of_measure, stock_quantity, current_discount, photo 
+                             FROM Tovar ORDER BY product_name";
+
+            SqlCommand command = new SqlCommand(query, connection);
+            SqlDataReader reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                string name = reader["product_name"].ToString();
+                string category = reader["category"].ToString();
+                string description = reader["description"].ToString();
+                string producer = reader["manufacturer"].ToString();
+                string supplier = reader["supplier"].ToString();
+                decimal price = Convert.ToDecimal(reader["price"]);
+                string unit = reader["unit_of_measure"].ToString();
+                int quantity = Convert.ToInt32(reader["stock_quantity"]);
+                decimal discount = Convert.ToDecimal(reader["current_discount"]);
+
+                // Создаем карточку товара
+                Panel card = CreateProductCard(name, category, description, producer, supplier, price, unit, quantity, discount, reader["photo"]);
+                flowLayoutPanel.Controls.Add(card);
+            }
+
+            reader.Close();
+        }
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show("Ошибка загрузки товаров: " + ex.Message);
+    }
+}
