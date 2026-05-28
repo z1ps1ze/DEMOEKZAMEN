@@ -1,0 +1,42 @@
+private void button1_Click(object sender, EventArgs e)
+{
+    string login = textBox1.Text;
+    string password = textBox2.Text;
+
+    try
+    {
+        using (SqlConnection connection = new SqlConnection(connectionString))
+        {
+            connection.Open();
+
+            string query = "SELECT full_name, role FROM [User] WHERE login = @login AND password = @password";
+            SqlCommand command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@login", login);
+            command.Parameters.AddWithValue("@password", password);
+
+            SqlDataReader reader = command.ExecuteReader();
+
+            if (reader.Read())
+            {
+                string userName = reader["full_name"].ToString();
+                string userRole = reader["role"].ToString();
+
+                // Открываем форму с товарами
+                Form2 productsForm = new Form2(userName, userRole);
+                productsForm.Show();
+                this.Hide();
+            }
+            else
+            {
+                MessageBox.Show("Неверный логин или пароль", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            reader.Close();
+        }
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show("Ошибка: " + ex.Message);
+    }
+}
