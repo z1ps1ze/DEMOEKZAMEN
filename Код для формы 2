@@ -1,4 +1,6 @@
-  public partial class Form2 : Form
+using System.Data.SqlClient;
+
+public partial class Form2 : Form
  {
      string connectionString = "Data Source=Сервер;Initial Catalog=StoreDB;Integrated Security=True";
      string userName;
