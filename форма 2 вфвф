@@ -1,0 +1,178 @@
+private Panel CreateProductCard(string name, string category, string description, string producer, string supplier, decimal price, string unit, int quantity, decimal discount, object photo)
+{
+    // Основная панель карточки
+    Panel card = new Panel();
+    card.Size = new Size(700, 180);
+    card.BorderStyle = BorderStyle.FixedSingle;
+    card.Margin = new Padding(10, 10, 10, 20);
+    card.Padding = new Padding(5);
+
+    // Панель для фото (левая часть)
+    Panel photoPanel = new Panel();
+    photoPanel.Size = new Size(170, 170);
+    photoPanel.Location = new Point(5, 5);
+    photoPanel.BorderStyle = BorderStyle.FixedSingle;
+
+    // Изображение товара
+    PictureBox pictureBox = new PictureBox();
+    pictureBox.Size = new Size(150, 150);
+    pictureBox.Location = new Point(10, 10);
+    pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
+    pictureBox.BorderStyle = BorderStyle.FixedSingle;
+
+    // Загрузка изображения
+   
+        if (photo != DBNull.Value && System.IO.File.Exists(photo.ToString()))
+        {
+            pictureBox.Image = Image.FromFile(photo.ToString());
+        }
+        else
+        {
+            // Проверяем picture.png в папке с программой
+            string defaultPath = Application.StartupPath + "\\picture.png";
+            if (System.IO.File.Exists(defaultPath))
+            {
+                pictureBox.Image = Image.FromFile(defaultPath);
+            }
+        }
+    photoPanel.Controls.Add(pictureBox);
+
+    // Панель для информации (правая часть)
+    Panel infoPanel = new Panel();
+    infoPanel.Size = new Size(512, 170);
+    infoPanel.Location = new Point(180, 5);
+
+    // Первая строка: Категория | Наименование
+    Label lblCategoryName = new Label();
+    lblCategoryName.Text = $"{category} | {name}";
+    lblCategoryName.Location = new Point(5, 10);
+    lblCategoryName.Size = new Size(340, 22);
+    lblCategoryName.Font = new Font("Arial", 11, FontStyle.Bold);
+   
+
+    // Описание товара
+    string shortDescription = description.Length > 60 ?
+        description.Substring(0, 60) + "..." : description;
+    Label lblDescription = new Label();
+    lblDescription.Text = $"Описание товара: {shortDescription}";
+    lblDescription.Location = new Point(5, 35);
+    lblDescription.Size = new Size(340, 20);
+    lblDescription.Font = new Font("Arial", 9);
+
+    // Производитель
+    Label lblProducer = new Label();
+    lblProducer.Text = $"Производитель: {producer}";
+    lblProducer.Location = new Point(5, 58);
+    lblProducer.Size = new Size(340, 18);
+    lblProducer.Font = new Font("Arial", 9);
+
+    // Поставщик
+    Label lblSupplier = new Label();
+    lblSupplier.Text = $"Поставщик: {supplier}";
+    lblSupplier.Location = new Point(5, 79);
+    lblSupplier.Size = new Size(340, 18);
+    lblSupplier.Font = new Font("Arial", 9);
+
+    // Цена и скидка
+    decimal finalPrice = price * (1 - discount / 100);
+
+    // Создаем панель для отображения цены со скидкой
+    Panel pricePanel = new Panel();
+    pricePanel.Location = new Point(5, 100);
+    pricePanel.Size = new Size(340, 22);
+    pricePanel.BackColor = Color.Transparent;
+
+    if (discount > 0)
+    {
+        // Основная цена - перечеркнутая, красная
+        Label lblOldPrice = new Label();
+        lblOldPrice.Text = $"{price.ToString("C")}";
+        lblOldPrice.AutoSize = true;
+        lblOldPrice.Font = new Font("Arial", 9, FontStyle.Strikeout | FontStyle.Bold);
+        lblOldPrice.ForeColor = Color.Red;
+        lblOldPrice.Location = new Point(0, 3);
+
+        // Итоговая цена - черная
+        Label lblNewPrice = new Label();
+        lblNewPrice.Text = $" → {finalPrice.ToString("C")}";
+        lblNewPrice.AutoSize = true;
+        lblNewPrice.Font = new Font("Arial", 9, FontStyle.Bold);
+        lblNewPrice.ForeColor = Color.Black;
+        lblNewPrice.Location = new Point(lblOldPrice.Right + 5, 3);
+
+        pricePanel.Controls.Add(lblOldPrice);
+        pricePanel.Controls.Add(lblNewPrice);
+    }
+    else
+    {
+        // Без скидки - просто цена
+        Label lblPriceOnly = new Label();
+        lblPriceOnly.Text = $"Цена: {price.ToString("C")}";
+        lblPriceOnly.AutoSize = true;
+        lblPriceOnly.Font = new Font("Arial", 9, FontStyle.Bold);
+        lblPriceOnly.ForeColor = Color.Black;
+        lblPriceOnly.Location = new Point(0, 3);
+
+        pricePanel.Controls.Add(lblPriceOnly);
+    }
+
+    // Единица измерения
+    Label lblUnit = new Label();
+    lblUnit.Text = $"Единица измерения: {unit}";
+    lblUnit.Location = new Point(5, 125);
+    lblUnit.Size = new Size(340, 18);
+    lblUnit.Font = new Font("Arial", 9);
+
+    // Количество на складе
+    Label lblQuantity = new Label();
+    lblQuantity.Text = $"Количество на складе: {quantity}";
+    lblQuantity.Location = new Point(5, 146);
+    lblQuantity.Size = new Size(340, 18);
+    lblQuantity.Font = new Font("Arial", 9);
+
+    infoPanel.Controls.Add(lblCategoryName);
+    infoPanel.Controls.Add(lblDescription);
+    infoPanel.Controls.Add(lblProducer);
+    infoPanel.Controls.Add(lblSupplier);
+    infoPanel.Controls.Add(pricePanel);
+    infoPanel.Controls.Add(lblUnit);
+    infoPanel.Controls.Add(lblQuantity);
+
+    // Панель для скидки 
+    if (discount > 0)
+    {
+        Panel discountPanel = new Panel();
+        discountPanel.Size = new Size(140, 167); // Маленькая прямоугольная плашка
+        discountPanel.Location = new Point(552, 6); // Правый верхний угол карточки
+             
+        discountPanel.BorderStyle = BorderStyle.FixedSingle;
+
+        Label lblDiscount = new Label();
+        lblDiscount.Text = $"СКИДКА\n{discount}%";
+        lblDiscount.Font = new Font("Arial", 8, FontStyle.Bold);
+        lblDiscount.ForeColor = Color.Black;
+        lblDiscount.TextAlign = ContentAlignment.MiddleCenter;
+        lblDiscount.Dock = DockStyle.Fill; // Заполняет всю панель
+
+        discountPanel.Controls.Add(lblDiscount);
+        card.Controls.Add(discountPanel);
+    }
+
+    // Подсветка карточки в зависимости от условий
+    if (discount > 15)
+    {
+        // Если скидка превышает 15% - фон #2E8B57 (зеленый морской волны)
+        card.BackColor = ColorTranslator.FromHtml("#2E8B57");
+    }
+    else if (quantity == 0)
+    {
+        // Если товара нет на складе - голубой цвет
+        card.BackColor = Color.LightBlue;
+    }
+
+    // Добавляем все панели на карточку
+    card.Controls.Add(photoPanel);
+    card.Controls.Add(infoPanel);
+
+    return card;
+}
