@@ -1,0 +1,14 @@
+  public partial class Form2 : Form
+ {
+     string connectionString = "Data Source=Сервер;Initial Catalog=StoreDB;Integrated Security=True";
+     string userName;
+     string userRole;
+     private FlowLayoutPanel flowLayoutPanel;
+
+     public Form2(string full_name, string role)
+     {
+         InitializeComponent();
+         userName = full_name;
+         userRole = role;
+         this.Load += Form2_Load;
+     }
